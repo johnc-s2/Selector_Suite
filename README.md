@@ -1,2 +1,2 @@
 # Selector_Suite
-Packet Copilot and Configuration Copilot
+Selector AI Public Toolkit

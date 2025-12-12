@@ -1,0 +1,56 @@
+FROM ubuntu:latest
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+# =====================================================================
+# Base System Tools
+# =====================================================================
+RUN echo "==> Updating system and installing utilities..." \
+ && apt-get update -y \
+ && apt-get install -y --no-install-recommends \
+        sudo \
+        wget \
+        curl \
+        ca-certificates \
+        dos2unix \
+        tshark \
+        python3 \
+        python3-pip \
+        python3-venv \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
+# =====================================================================
+# Python dependencies
+#   • google-genai        → Native Gemini SDK (File Search + Packet Copilot)
+#   • langchain 0.2.x     → Old agent API (create_react_agent, AgentExecutor, Tool)
+#   • langchain-community → Tool / integration layer
+#   • langchain-google-genai → LangChain wrapper for Gemini
+#   • fastmcp             → MCP Server Runtime
+#   • streamlit           → Web UI
+#   • python-dotenv       → Env loading
+#   • requests            → API calls inside sub-agents
+# =====================================================================
+RUN echo "==> Installing Python packages..." \
+ && pip install --no-cache-dir --break-system-packages \
+        google-genai \
+        fastmcp \
+        streamlit \
+        python-dotenv \
+        requests \
+        "langchain<0.3.0" \
+        "langchain-community<0.3.0" \
+        "langchain-google-genai<2.0.0"
+
+# =====================================================================
+# App Code
+# =====================================================================
+COPY /packet_copilot /packet_copilot/
+
+RUN chmod +x /packet_copilot/start.sh \
+ && dos2unix /packet_copilot/start.sh
+
+# =====================================================================
+# Entrypoint
+# =====================================================================
+CMD ["/packet_copilot/start.sh"]

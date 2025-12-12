@@ -1,0 +1,31 @@
+FROM ubuntu:latest
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+# 1. Install System Dependencies (Combined to reduce layers)
+RUN echo "==> Upgrading system and installing utilities ...." \
+ && apt-get update \
+ && apt-get install -y \
+    wget \
+    python3 \
+    python3-pip \
+    dos2unix \
+ && rm -rf /var/lib/apt/lists/* # Clean up apt cache to save space
+
+# 2. Install Python Dependencies
+# We only need the specific libraries imported in your new scripts
+RUN echo "==> Installing Python packages..." \
+ && pip install --break-system-packages --no-cache-dir \
+    google-genai \
+    streamlit \
+    python-dotenv \
+    fastmcp
+
+# 3. Copy Application Code
+COPY /configuration_copilot /configuration_copilot/
+
+# 4. Fix Permissions
+RUN chmod +x /configuration_copilot/start.sh
+
+# 5. Start
+CMD ["/configuration_copilot/start.sh"]

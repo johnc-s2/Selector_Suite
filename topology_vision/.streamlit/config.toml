@@ -1,0 +1,4 @@
+[server]
+maxUploadSize = 20
+keepAlivePingInterval = 60 # Send ping every 60 seconds (default is 10s)
+keepAlivePingTimeout = 300 # Wait 300 seconds for pong (default is 20s)
